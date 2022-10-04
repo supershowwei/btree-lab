@@ -7,9 +7,9 @@ var btree = new BTree(5);
 
 var keys = new List<int>();
 
-while (keys.Count < 30)
+while (keys.Count < 150)
 {
-    var key = Random.Shared.Next(1, 100);
+    var key = Random.Shared.Next(1, 1000);
 
     if (keys.Contains(key)) continue;
 
@@ -18,18 +18,38 @@ while (keys.Count < 30)
 
 //var keys = Enumerable.Range(1, 9).ToList();
 
-keys = "43,91,95,84,75,51,78,15,49,98,39,7,60,11,28,23,47,34,17,94,92,63,5,57,1,41,90,36,61,53".Split(",").Select(int.Parse).ToList();
-
-Console.WriteLine(string.Join(",", keys));
-
 foreach (var key in keys)
 {
-    if (key == 61)
-    {
-        
-    }
     //btree.Insert(key);
     btree.Add(key);
 }
 
-Console.WriteLine("Hello, World!");
+var treeMap = Enumerable.Range(1, 100).Select(i => string.Empty).ToArray();
+
+GenerateTreeMap(btree.Root, 0);
+
+foreach (var map in treeMap)
+{
+    if (string.IsNullOrEmpty(map)) continue;
+
+    Console.WriteLine(map);
+}
+
+Console.ReadLine();
+
+void GenerateTreeMap(BTreeNode node, int level)
+{
+    if (node == null) return;
+
+    if (treeMap[level] != string.Empty)
+    {
+        treeMap[level] += "  ";
+    }
+
+    treeMap[level] += string.Join(",", node.Keys);
+
+    foreach (var child in node.Children)
+    {
+        GenerateTreeMap(child, level + 1);
+    }
+}

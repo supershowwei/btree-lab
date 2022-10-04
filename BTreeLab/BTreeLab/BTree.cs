@@ -3,26 +3,29 @@
 public class BTree
 {
     private readonly int maxKeyLength;
-    private BTreeNode root;
 
     public BTree(int maxKeyLength)
     {
         this.maxKeyLength = maxKeyLength;
     }
 
+    public BTreeNode Root { get; private set; }
+
+    public int Count { get; private set; }
+
     public void Add(int key)
     {
         BTreeNode node;
 
-        if (this.root == null)
+        if (this.Root == null)
         {
-            this.root = new BTreeNode(this.maxKeyLength, null);
+            this.Root = new BTreeNode(this.maxKeyLength, null);
 
-            node = this.root;
+            node = this.Root;
         }
         else
         {
-            node = FindLeaf(this.root, key);
+            node = FindLeaf(this.Root, key);
         }
 
         node.Add(key);
@@ -47,8 +50,6 @@ public class BTree
 
         return FindLeaf(node.Children[index], key);
     }
-
-    public int Count { get; private set; }
 }
 
 public class BTreeNode
@@ -88,6 +89,7 @@ public class BTreeNode
                 var comparison = key.CompareTo(this.Keys[index]);
 
                 if (comparison == 0) return -1;
+
                 if (comparison < 0) break;
             }
 
@@ -110,42 +112,26 @@ public class BTreeNode
 
             var leftNode = new BTreeNode(this.maxKeyLength, this);
 
-            leftNode.Children[0] = this.Children[index];
+            leftNode.SetChild(0, this.Children[index]);
 
             for (var i = index; index < medianIndex; index++)
             {
                 leftNode.Keys[i] = this.Keys[index];
-
-                var child = this.Children[index + 1];
-
-                if (child != null)
-                {
-                    child.Parent = leftNode;
-                }
-
-                leftNode.Children[i + 1] = child;
+                leftNode.SetChild(i + 1, this.Children[index + 1]);
 
                 i++;
             }
 
+            index++;
+
             var rightNode = new BTreeNode(this.maxKeyLength, this);
 
-            rightNode.Children[0] = this.Children[index];
-
-            index++;
+            rightNode.SetChild(0, this.Children[index]);
 
             for (var i = 0; index < keyCount; index++)
             {
                 rightNode.Keys[i] = this.Keys[index];
-
-                var child = this.Children[index + 1];
-
-                if (child != null)
-                {
-                    child.Parent = rightNode;
-                }
-
-                rightNode.Children[i + 1] = child;
+                rightNode.SetChild(i + 1, this.Children[index + 1]);
 
                 i++;
             }
@@ -163,13 +149,10 @@ public class BTreeNode
             }
             else
             {
-                var indexInParent = this.Parent.Add(medianKey.Value);
+                var parentIndex = this.Parent.Add(medianKey.Value);
 
-                this.Parent.Children[indexInParent] = leftNode;
-                leftNode.Parent = this.Parent;
-
-                this.Parent.Children[indexInParent + 1] = rightNode;
-                rightNode.Parent = this.Parent;
+                this.Parent.SetChild(parentIndex, leftNode);
+                this.Parent.SetChild(parentIndex + 1, rightNode);
             }
 
             if (key < medianKey)
@@ -183,5 +166,15 @@ public class BTreeNode
 
             return -1;
         }
+    }
+
+    private void SetChild(int index, BTreeNode child)
+    {
+        if (child != null)
+        {
+            child.Parent = this;
+        }
+
+        this.Children[index] = child;
     }
 }

@@ -92,6 +92,11 @@ public class BTree
             }
         }
 
+        if (!node.IsLeaf)
+        {
+            return FindNode(node.Children[i], key, out index);
+        }
+
         index = -1;
         return null;
     }
@@ -132,27 +137,93 @@ public class BTreeNode
 
     public void RemoveAt(int index)
     {
-        // 刪除的是葉節點
-        // 如果不富有，
         if (this.IsLeaf)
         {
-            this.KeyCount--;
-
-            for (var i = index; i < this.KeyCount; i++)
-            {
-                this.Keys[index] = this.Keys[index + 1];
-            }
-
-            this.Keys[this.KeyCount] = default;
+            this.DeleteAt(index);
 
             if (this.KeyCount < this.minKeyLength)
             {
+                var childIndex = 0;
+                for (; childIndex < this.Parent.Children.Length; childIndex++)
+                {
+                    if (this.Parent.Children[childIndex] == this) break;
+                }
 
+                var leftSibling = childIndex > 0 ? this.Parent.Children[childIndex - 1] : default;
+                var rightSibling = childIndex < this.maxKeyLength ? this.Parent.Children[childIndex + 1] : default;
+
+                var parentIndex = leftSibling != null ? childIndex - 1 : childIndex;
+
+                if (leftSibling != null && leftSibling.KeyCount > this.minKeyLength)
+                {
+                    this.Add(this.Parent.Keys[parentIndex].Value);
+                    this.Parent.Keys[parentIndex] = leftSibling.Keys[leftSibling.KeyCount - 1];
+
+                    leftSibling.RemoveAt(leftSibling.KeyCount - 1);
+                }
+                else if (rightSibling != null && rightSibling.KeyCount > this.minKeyLength)
+                {
+                    this.Add(this.Parent.Keys[parentIndex].Value);
+                    this.Parent.Keys[parentIndex] = rightSibling.Keys[0];
+
+                    rightSibling.RemoveAt(0);
+                }
+                else
+                {
+                    var node = new BTreeNode(this.maxKeyLength, this.Parent);
+
+                    var nodeIndex = 0;
+
+                    if (leftSibling != null)
+                    {
+                        for (var i = 0; i < leftSibling.KeyCount; i++)
+                        {
+                            node.Keys[nodeIndex] = leftSibling.Keys[i];
+                            node.KeyCount++;
+
+                            nodeIndex++;
+                        }
+
+                        node.Keys[nodeIndex] = this.Parent.Keys[parentIndex];
+                        node.KeyCount++;
+
+                        nodeIndex++;
+
+                        for (var i = 0; i < this.KeyCount; i++)
+                        {
+                            node.Keys[nodeIndex] = this.Keys[i];
+                            node.KeyCount++;
+
+                            nodeIndex++;
+                        }
+                    }
+                    else if (rightSibling != null)
+                    {
+                        for (var i = 0; i < this.KeyCount; i++)
+                        {
+                            node.Keys[nodeIndex] = this.Keys[i];
+                            node.KeyCount++;
+
+                            nodeIndex++;
+                        }
+
+                        node.Keys[nodeIndex] = this.Parent.Keys[parentIndex];
+                        node.KeyCount++;
+
+                        nodeIndex++;
+
+                        for (var i = 0; i < rightSibling.KeyCount; i++)
+                        {
+                            node.Keys[nodeIndex] = rightSibling.Keys[i];
+                            node.KeyCount++;
+
+                            nodeIndex++;
+                        }
+                    }
+
+
+                }
             }
-        }
-        else
-        {
-
         }
     }
 
@@ -181,6 +252,20 @@ public class BTreeNode
         this.Children[index] = default;
 
         return index;
+    }
+
+    private void DeleteAt(int index)
+    {
+        this.KeyCount--;
+
+        for (var i = index; i < this.KeyCount; i++)
+        {
+            this.Keys[i] = this.Keys[i + 1];
+            this.Children[i] = this.Children[i + 1];
+        }
+
+        this.Keys[this.KeyCount] = default;
+        this.Children[this.KeyCount + 1] = default;
     }
 
     private void SplitIfNecessary()

@@ -16,7 +16,7 @@ while (keys.Count < 100)
     keys.Add(key);
 }
 
-//keys = "761,857,766,829,250,33,670,740,180,665".Split(",").Select(int.Parse).ToList();
+keys = "60,67,5,76,66,59,58,90,11,81,40,57,2,6,43,74,85,75,70,18,31,64,95,84,54,99,86,48,52,93".Split(",").Select(int.Parse).ToList();
 
 Console.WriteLine(string.Join(",", keys));
 
@@ -27,6 +27,8 @@ foreach (var key in keys)
     //btree.Insert(key);
     btree.Add(key);
 }
+
+btree.Remove(81);
 
 var treeMap = Enumerable.Range(1, 100).Select(i => string.Empty).ToArray();
 

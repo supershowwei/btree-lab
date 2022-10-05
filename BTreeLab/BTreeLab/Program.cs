@@ -7,7 +7,7 @@ var btree = new BTree(5);
 
 var keys = new List<int>();
 
-while (keys.Count < 150)
+while (keys.Count < 100)
 {
     var key = Random.Shared.Next(1, 1000);
 
@@ -15,6 +15,10 @@ while (keys.Count < 150)
 
     keys.Add(key);
 }
+
+//keys = "761,857,766,829,250,33,670,740,180,665".Split(",").Select(int.Parse).ToList();
+
+Console.WriteLine(string.Join(",", keys));
 
 //var keys = Enumerable.Range(1, 9).ToList();
 

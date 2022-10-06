@@ -1,4 +1,6 @@
-﻿namespace BTreeLab;
+﻿using System;
+
+namespace BTreeLab;
 
 public class BTree
 {
@@ -177,28 +179,45 @@ public class BTreeNode
         var leftSibling = childIndexInParent > 0 ? this.Parent.Children[childIndexInParent - 1] : default;
         var rightSibling = childIndexInParent < this.maxKeyLength ? this.Parent.Children[childIndexInParent + 1] : default;
 
-        var parentKeyIndex = leftSibling != null ? childIndexInParent - 1 : childIndexInParent;
-
         if (leftSibling != null && leftSibling.KeyCount > this.minKeyLength)
         {
+            var parentKeyIndex = childIndexInParent - 1;
+
+            if (this.KeyCount == 0)
+            {
+                this.Children[1] = this.Children[0];
+            }
+
             this.Insert(this.Parent.Keys[parentKeyIndex].Value);
             this.Parent.Keys[parentKeyIndex] = leftSibling.Keys[leftSibling.KeyCount - 1];
-            this.Children[0] = leftSibling.Children[leftSibling.KeyCount];
+
+            SetChild(this, 0, leftSibling.Children[leftSibling.KeyCount]);
 
             leftSibling.Children[leftSibling.KeyCount] = default;
             leftSibling.DeleteAt(leftSibling.KeyCount - 1);
         }
         else if (rightSibling != null && rightSibling.KeyCount > this.minKeyLength)
         {
+            var parentKeyIndex = childIndexInParent;
+
             this.Insert(this.Parent.Keys[parentKeyIndex].Value);
             this.Parent.Keys[parentKeyIndex] = rightSibling.Keys[0];
-            this.Children[this.KeyCount] = rightSibling.Children[0];
 
-            rightSibling.Children[0] = default;
+            SetChild(this, this.KeyCount, rightSibling.Children[0]);
+            
+            for (var i = 0; i < rightSibling.KeyCount; i++)
+            {
+                rightSibling.Children[i] = rightSibling.Children[i + 1];
+            }
+
+            rightSibling.Children[rightSibling.KeyCount] = rightSibling.Children[rightSibling.KeyCount + 1];
+
             rightSibling.DeleteAt(0);
         }
         else
         {
+            var parentKeyIndex = leftSibling != null ? childIndexInParent - 1 : childIndexInParent;
+
             var mergedNode = leftSibling ?? this;
             var manureNode = mergedNode == this ? rightSibling : this;
 
@@ -228,18 +247,17 @@ public class BTreeNode
 
             if (this.Parent.IsRoot && this.Parent.KeyCount == 0)
             {
-                Array.Clear(this.Parent.Keys);
-                Array.Clear(this.Parent.Children);
+                Array.Clear(this.Parent.Keys, 0, this.Parent.Keys.Length);
+                Array.Clear(this.Parent.Children, 0, this.Parent.Children.Length);
 
                 for (var i = 0; i < mergedNode.KeyCount; i++)
                 {
                     this.Parent.Keys[i] = mergedNode.Keys[i];
-                    this.Parent.Children[i] = mergedNode.Children[i];
-                    this.Parent.Children[i].Parent = this.Parent;
+
+                    SetChild(this.Parent, i, mergedNode.Children[i]);
                 }
 
-                this.Parent.Children[mergedNode.KeyCount] = mergedNode.Children[mergedNode.KeyCount];
-                this.Parent.Children[mergedNode.KeyCount].Parent = this.Parent;
+                SetChild(this.Parent, mergedNode.KeyCount, mergedNode.Children[mergedNode.KeyCount]);
 
                 this.Parent.KeyCount = mergedNode.KeyCount;
             }
@@ -283,18 +301,20 @@ public class BTreeNode
             if (comparison < 0) break;
         }
 
-        for (var i = this.KeyCount; i > index; i--)
+        if (this.KeyCount > 0)
         {
-            this.Keys[i] = this.Keys[i - 1];
-            this.Children[i + 1] = this.Children[i];
-        }
+            for (var i = this.KeyCount; i > index; i--)
+            {
+                this.Keys[i] = this.Keys[i - 1];
+                this.Children[i + 1] = this.Children[i];
+            }
 
-        this.Children[index + 1] = this.Children[index];
+            this.Children[index + 1] = this.Children[index];
+            this.Children[index] = default;
+        }
 
         this.Keys[index] = key;
         this.KeyCount++;
-
-        this.Children[index] = default;
 
         return index;
     }
@@ -307,7 +327,6 @@ public class BTreeNode
         {
             this.Keys[i] = this.Keys[i + 1];
         }
-
 
         this.Keys[this.KeyCount] = default;
     }
@@ -354,8 +373,8 @@ public class BTreeNode
 
         if (this.IsRoot)
         {
-            Array.Clear(this.Keys);
-            Array.Clear(this.Children);
+            Array.Clear(this.Keys, 0, this.Keys.Length);
+            Array.Clear(this.Children, 0, this.Children.Length);
 
             this.Keys[0] = medianKey;
             this.Children[0] = leftNode;

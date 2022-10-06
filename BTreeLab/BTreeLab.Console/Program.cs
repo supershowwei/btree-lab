@@ -16,7 +16,8 @@ while (keys.Count < 100)
     keys.Add(key);
 }
 
-keys = "96,18,80,46,26,8,81,30,12,10,59,34,71,45,31,66,90,43,72,29,47,11,77,19,14,54,6,87,91,36,24,3,21,64,40,48,98,88,20,25,27,23,79,73,5,86,70,94,15,69".Split(",").Select(int.Parse).ToList();
+keys = "21,73,23,15,66,72,34,1,79,64,95,35,8,2,84,26,52,97,51,88,80,36,24,62,94,89,76,75,70,63,49,91,33,43,27,92,9,25,78,65,3,45,53,90,55,38,74,59,69,93".Split(",").Select(int.Parse).ToList();
+keys = "21,73,23,15,66,72,34,1,79,64,95,35,8,2,84,26,52,97,51,88,80,36,24,62,94,89,76,75,70,63,49,91,33,43,27,92,9,25,78,65,3,45,53,90,55,38,74,59,69,93".Split(",").Select(int.Parse).ToList();
 
 Console.WriteLine(string.Join(",", keys));
 Console.WriteLine();
@@ -65,10 +66,10 @@ void PrintTree(BTree btree)
 
         if (treeMap[level] != string.Empty)
         {
-            treeMap[level] += "  ";
+            treeMap[level] += " | ";
         }
 
-        treeMap[level] += string.Join(",", node.Keys);
+        treeMap[level] += string.Join(",", node.Keys).Trim(',');
 
         foreach (var child in node.Children)
         {

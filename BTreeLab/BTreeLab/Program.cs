@@ -3,7 +3,7 @@
 using BTreeLab;
 
 //var btree = new BTreeG<int>(4);
-var btree = new BTree(5);
+var btree = new BTree(4);
 
 var keys = new List<int>();
 
@@ -16,9 +16,10 @@ while (keys.Count < 100)
     keys.Add(key);
 }
 
-keys = "60,67,5,76,66,59,58,90,11,81,40,57,2,6,43,74,85,75,70,18,31,64,95,84,54,99,86,48,52,93".Split(",").Select(int.Parse).ToList();
+keys = "96,18,80,46,26,8,81,30,12,10,59,34,71,45,31,66,90,43,72,29,47,11,77,19,14,54,6,87,91,36,24,3,21,64,40,48,98,88,20,25,27,23,79,73,5,86,70,94,15,69".Split(",").Select(int.Parse).ToList();
 
 Console.WriteLine(string.Join(",", keys));
+Console.WriteLine();
 
 //var keys = Enumerable.Range(1, 9).ToList();
 
@@ -28,34 +29,50 @@ foreach (var key in keys)
     btree.Add(key);
 }
 
-btree.Remove(81);
-
-var treeMap = Enumerable.Range(1, 100).Select(i => string.Empty).ToArray();
-
-GenerateTreeMap(btree.Root, 0);
-
-foreach (var map in treeMap)
-{
-    if (string.IsNullOrEmpty(map)) continue;
-
-    Console.WriteLine(map);
-}
-
+PrintTree(btree);
+Console.WriteLine();
 Console.ReadLine();
 
-void GenerateTreeMap(BTreeNode node, int level)
-{
-    if (node == null) return;
+btree.Remove(64);
+btree.Remove(66);
 
-    if (treeMap[level] != string.Empty)
+PrintTree(btree);
+Console.WriteLine();
+Console.ReadLine();
+
+btree.Remove(59);
+
+PrintTree(btree);
+Console.WriteLine();
+Console.ReadLine();
+
+void PrintTree(BTree btree)
+{
+    var treeMap = Enumerable.Range(1, 100).Select(i => string.Empty).ToArray();
+
+    GenerateTreeMap(btree.Root, 0);
+
+    foreach (var map in treeMap)
     {
-        treeMap[level] += "  ";
+        if (string.IsNullOrEmpty(map)) continue;
+
+        Console.WriteLine(map);
     }
 
-    treeMap[level] += string.Join(",", node.Keys);
-
-    foreach (var child in node.Children)
+    void GenerateTreeMap(BTreeNode node, int level)
     {
-        GenerateTreeMap(child, level + 1);
+        if (node == null) return;
+
+        if (treeMap[level] != string.Empty)
+        {
+            treeMap[level] += "  ";
+        }
+
+        treeMap[level] += string.Join(",", node.Keys);
+
+        foreach (var child in node.Children)
+        {
+            GenerateTreeMap(child, level + 1);
+        }
     }
 }

@@ -1,34 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
+
+[assembly: InternalsVisibleTo("BTreeLab.Console")]
+[assembly: InternalsVisibleTo("BTreeLab.Tests")]
 
 namespace BTreeLab;
 
 public class BTree
 {
-    private readonly int degree;
+    private readonly BTreeNode root;
 
     public BTree(int degree)
     {
-        this.degree = degree;
+        this.root = new BTreeNode(degree, null);
     }
-
-    public BTreeNode Root { get; private set; }
 
     public int Count { get; private set; }
 
+    // For Testing and Debugging
+    internal BTreeNode Root => this.root;
+
     public void Add(int key)
     {
-        BTreeNode node;
-
-        if (this.Root == null)
-        {
-            this.Root = new BTreeNode(this.degree, null);
-
-            node = this.Root;
-        }
-        else
-        {
-            node = FindLeaf(this.Root, key);
-        }
+        var node= FindLeaf(this.root, key);
 
         node.Add(key);
 
@@ -40,13 +37,13 @@ public class BTree
         BTreeNode node;
         int index;
 
-        if (this.Root == null)
+        if (this.root == null)
         {
-            throw new ArgumentNullException(nameof(this.Root));
+            throw new ArgumentNullException(nameof(this.root));
         }
         else
         {
-            node = FindNode(this.Root, key, out index);
+            node = FindNode(this.root, key, out index);
         }
 
         if (node != null)
@@ -54,6 +51,79 @@ public class BTree
             node.RemoveAt(index);
 
             this.Count--;
+        }
+    }
+
+    public int Find(int key)
+    {
+        return Find(this.root);
+
+        int Find(BTreeNode node)
+        {
+            var i = 0;
+
+            for (; i < node.KeyCount; i++)
+            {
+                var comparison = key.CompareTo(node.Keys[i]);
+
+                if (comparison == 0)
+                {
+                    return node.Keys[i].Value;
+                }
+
+                if (comparison < 0)
+                {
+                    if (!node.IsLeaf)
+                    {
+                        return Find(node.Children[i]);
+                    }
+                }
+            }
+
+            if (!node.IsLeaf)
+            {
+                return Find(node.Children[i]);
+            }
+
+            return -1;
+        }
+    }
+
+    public IEnumerable<int> GreaterThan(int key)
+    {
+        return Fetch(this.root);
+
+        IEnumerable<int> Fetch(BTreeNode node)
+        {
+            if (node == null) yield break;
+
+            var i = 0;
+
+            for (; i < node.KeyCount; i++)
+            {
+                var comparison = key.CompareTo(node.Keys[i]);
+
+                if (comparison < 0)
+                {
+                    if (!node.IsLeaf)
+                    {
+                        foreach (var childKey in Fetch(node.Children[i]))
+                        {
+                            yield return childKey;
+                        }
+                    }
+
+                    yield return node.Keys[i].Value;
+                }
+            }
+
+            if (!node.IsLeaf)
+            {
+                foreach (var childKey in Fetch(node.Children[i]))
+                {
+                    yield return childKey;
+                }
+            }
         }
     }
 
@@ -104,7 +174,7 @@ public class BTree
     }
 }
 
-public class BTreeNode
+internal class BTreeNode
 {
     private readonly int maxKeyLength;
     private readonly int minKeyLength;
@@ -120,15 +190,15 @@ public class BTreeNode
 
     public int?[] Keys { get; }
 
-    public BTreeNode Parent { get; private set; }
+    public int KeyCount { get; private set; }
 
     public BTreeNode[] Children { get; }
+
+    public BTreeNode Parent { get; private set; }
 
     public bool IsRoot => this.Parent == null;
 
     public bool IsLeaf => this.Children[0] == null;
-
-    public int KeyCount { get; private set; }
 
     public void Add(int key)
     {

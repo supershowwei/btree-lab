@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System.Linq;
+using BenchmarkDotNet.Attributes;
 
 namespace BTreeLab.Console;
 
@@ -15,11 +16,11 @@ public class BPlusTreeVsList
         this.keys = new List<int>();
         this.dict = new Dictionary<int, int>();
 
-        while (this.keys.Count < 1000)
+        while (this.keys.Count < 10000)
         {
-            var key = Random.Shared.Next(1, 10000);
+            var key = Random.Shared.Next(1, 100000);
 
-            if (this.keys.Contains(key)) continue;
+            if (this.dict.ContainsKey(key)) continue;
 
             this.keys.Add(key);
             this.dict.Add(key, key);
@@ -29,14 +30,14 @@ public class BPlusTreeVsList
 
         while (this.searchKeys.Count < 100)
         {
-            var key = Random.Shared.Next(1, 10000);
+            var key = Random.Shared.Next(1, 100000);
 
             if (this.searchKeys.Contains(key)) continue;
 
             this.searchKeys.Add(key);
         }
 
-        this.bplustree = new BPlusTree(7);
+        this.bplustree = new BPlusTree(100);
 
         foreach (var key in this.keys)
         {

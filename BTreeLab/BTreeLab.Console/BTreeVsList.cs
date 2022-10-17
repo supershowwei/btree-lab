@@ -19,7 +19,7 @@ public class BTreeVsList
         {
             var key = Random.Shared.Next(1, 10000);
 
-            if (this.keys.Contains(key)) continue;
+            if (this.dict.ContainsKey(key)) continue;
 
             this.keys.Add(key);
             this.dict.Add(key, key);
@@ -36,7 +36,7 @@ public class BTreeVsList
             this.searchKeys.Add(key);
         }
 
-        this.btree = new BTree(7);
+        this.btree = new BTree(33);
 
         foreach (var key in this.keys)
         {

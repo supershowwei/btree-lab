@@ -4,7 +4,7 @@ var treeMap = [];
 var btreeTestCaseTemplate = `[TestMethod]
 public void Test_Add_Key()
 {
-    var btree = new BTree(5);
+    var btree = new BTree(7);
 
     foreach (var key in Keys)
     {
@@ -18,7 +18,7 @@ public void Test_Add_Key()
 var bplusTreeTestCaseTemplate = `[TestMethod]
 public void Test_Add_Key()
 {
-    var bplustree = new BPlusTree(5);
+    var bplustree = new BPlusTree(7);
 
     foreach (var key in Keys)
     {
@@ -88,8 +88,8 @@ var generateTree = function (i) {
     treeMap[${j}].Should().Be("${treeMap[j]}");`;
             }
 
-            console.log(btreeTestCaseTemplate.replaceAll("{{0}}", assertions));
-            // console.log(bplusTreeTestCaseTemplate.replaceAll("{{0}}", assertions));
+            // console.log(btreeTestCaseTemplate.replaceAll("{{0}}", assertions));
+            console.log(bplusTreeTestCaseTemplate.replaceAll("{{0}}", assertions));
         }
     });
 }

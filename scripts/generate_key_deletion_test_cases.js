@@ -4,7 +4,7 @@ var treeMap = [];
 var btreeTestCaseTemplate = `[TestMethod]
 public void Test_Remove_Keys_{{0}}()
 {
-    var btree = new BTree(5);
+    var btree = new BTree(7);
 
     foreach (var key in Keys)
     {
@@ -24,7 +24,7 @@ public void Test_Remove_Keys_{{0}}()
 var bplusTreeTestCaseTemplate = `[TestMethod]
 public void Test_Remove_Keys_{{0}}()
 {
-    var bplustree = new BPlusTree(5);
+    var bplustree = new BPlusTree(7);
 
     foreach (var key in Keys)
     {
@@ -100,8 +100,8 @@ var deleteTree = function (i) {
 treeMap[${j}].Should().Be("${treeMap[j]}");`;
         }
 
-        console.log(btreeTestCaseTemplate.replaceAll("{{0}}", i).replaceAll("{{1}}", assertions));
-        // console.log(bplusTreeTestCaseTemplate.replaceAll("{{0}}", i).replaceAll("{{1}}", assertions));
+        // console.log(btreeTestCaseTemplate.replaceAll("{{0}}", i).replaceAll("{{1}}", assertions));
+        console.log(bplusTreeTestCaseTemplate.replaceAll("{{0}}", i).replaceAll("{{1}}", assertions));
 
         if (i < keys.length) {
             deleteTree(i);

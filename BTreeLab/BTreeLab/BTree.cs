@@ -369,7 +369,7 @@ internal class BTreeNode
             if (comparison < 0) break;
         }
 
-        if (this.KeyCount > 0)
+        if (this.KeyCount > 0 && index < this.KeyCount)
         {
             for (var i = this.KeyCount; i > index; i--)
             {

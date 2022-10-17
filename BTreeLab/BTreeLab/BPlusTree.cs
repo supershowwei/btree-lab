@@ -253,14 +253,22 @@ internal class BPlusTreeNode
             {
                 var parentKeyIndex = childIndexInParent - 1;
 
-                this.Insert(this.Parent.Keys[parentKeyIndex].Value);
+                if (this.IsLeaf)
+                {
+                    this.Insert(leftSibling.Keys[leftSibling.KeyCount - 1].Value);
+                }
+                else
+                {
+                    this.Insert(this.Parent.Keys[parentKeyIndex].Value);
+                }
+
                 this.Parent.Keys[parentKeyIndex] = leftSibling.Keys[leftSibling.KeyCount - 1];
             }
             else
             {
-                SetInternalNode(leftSibling.Keys[leftSibling.KeyCount - 1]);
-
                 this.Insert(leftSibling.Keys[leftSibling.KeyCount - 1].Value);
+
+                SetInternalNode(this.Keys[0]);
             }
 
             SetChild(this, 0, leftSibling.Children[leftSibling.KeyCount]);
@@ -275,14 +283,22 @@ internal class BPlusTreeNode
             if (internalNode == null)
             {
                 this.Insert(this.Parent.Keys[parentKeyIndex].Value);
-                this.Parent.Keys[parentKeyIndex] = rightSibling.Keys[0];
+
+                if (this.IsLeaf)
+                {
+                    this.Parent.Keys[parentKeyIndex] = rightSibling.Keys[1];
+                }
+                else
+                {
+                    this.Parent.Keys[parentKeyIndex] = rightSibling.Keys[0];
+                }
             }
             else
             {
-                SetInternalNode(rightSibling.Keys[0]);
-
                 this.Insert(rightSibling.Keys[0].Value);
                 this.Parent.Keys[parentKeyIndex] = rightSibling.Keys[1];
+
+                SetInternalNode(this.Keys[0]);
             }
 
             SetChild(this, this.KeyCount, rightSibling.Children[0]);
@@ -399,7 +415,7 @@ internal class BPlusTreeNode
             if (comparison < 0) break;
         }
 
-        if (this.KeyCount > 0)
+        if (this.KeyCount > 0 && index < this.KeyCount)
         {
             for (var i = this.KeyCount; i > index; i--)
             {

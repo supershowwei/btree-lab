@@ -3,4 +3,5 @@
 using BenchmarkDotNet.Running;
 using BTreeLab.Console;
 
-BenchmarkRunner.Run<BTreeVsList>();
+//BenchmarkRunner.Run<BTreeVsList>();
+BenchmarkRunner.Run<BPlusTreeVsList>();

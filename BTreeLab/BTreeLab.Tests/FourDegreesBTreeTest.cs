@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BTreeLab.Tests
 {
     [TestClass]
-    public class BTreeTest
+    public class FourDegreesBTreeTest
     {
         private static readonly List<int> Keys = "21,73,23,15,66,72,34,1,79,64,95,35,8,2,84,26,52,97,51,88,80,36,24,62,94,89,76,75,70,63,49,91,33,43,27,92,9,25,78,65,3,45,53,90,55,38,74,59,69,93".Split(",").Select(int.Parse).ToList();
 

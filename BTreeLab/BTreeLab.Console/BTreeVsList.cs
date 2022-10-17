@@ -70,31 +70,4 @@ public class BTreeVsList
             var result = this.keys.SingleOrDefault(x => x == searchKey);
         }
     }
-
-    //[Benchmark]
-    //public void DictionaryTryGetValue()
-    //{
-    //    foreach (var searchKey in this.searchKeys)
-    //    {
-    //        this.dict.TryGetValue(searchKey, out var result);
-    //    }
-    //}
-
-    //[Benchmark]
-    //public void ListWhere()
-    //{
-    //    foreach (var searchKey in this.searchKeys)
-    //    {
-    //        var result = this.keys.Where(key => key > searchKey).ToList();
-    //    }
-    //}
-
-    //[Benchmark]
-    //public void DictionaryWhere()
-    //{
-    //    foreach (var searchKey in this.searchKeys)
-    //    {
-    //        var result = this.dict.Keys.Where(key => key > searchKey).ToList();
-    //    }
-    //}
 }
